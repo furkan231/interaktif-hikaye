@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hikaye Yaz ve Kayıt Ol</title>
+    <link rel="icon" href="/favicon-32x32.png" type="image/x-icon" />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Arial", sans-serif;
+
+        color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* Arka Plan */
+      .scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url(chat.webp) no-repeat center center fixed;
+        background-size: cover;
+        filter: brightness(30%);
+        z-index: -1;
+      }
+
+      /* Ana Konteyner */
+      .container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 70%;
+        width: 80%;
+      }
+
+      /* Kayıt Formu */
+      .form-box {
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+        width: 50%;
+        animation: fadeIn 2s ease-in-out forwards;
+        display: none;
+      }
+
+      .form-box.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .form-box h2 {
+        text-align: center;
+        font-size: 36px;
+        color: #ffcc00;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      }
+
+      .form-box label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .form-box input {
+        width: 100%;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 2px solid #ffcc00;
+        background-color: #333;
+        color: #f4f4f4;
+        font-size: 18px;
+      }
+
+      .form-box button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        background-color: #ffcc00;
+        color: #333;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .form-box button:hover {
+        background-color: #e6b800;
+      }
+
+      .switch-link {
+        color: #ffcc00;
+        cursor: pointer;
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      .exciting-words {
+        font-size: 24px;
+        color: #ffcc00;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 20px;
+        animation: excitingText 3s ease-in-out infinite alternate;
+      }
+
+      @keyframes excitingText {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene"></div>
+    <div class="container">
+      <div class="form-box active" id="register-box">
+        <h2>Kayıt Ol</h2>
+        <form id="registration-form">
+          <label for="username">Kullanıcı Adı</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Kullanıcı Adı"
+            required
+          />
+          <label for="email">E-posta</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="E-posta"
+            required
+          />
+          <label for="password">Şifre</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Şifre"
+            required
+          />
+          <button type="submit">Kayıt Ol</button>
+        </form>
+        <p id="register-message"></p>
+        <p class="switch-link" id="to-login">
+          Zaten hesabınız var mı? Giriş Yapın.
+        </p>
+      </div>
+
+      <div class="form-box" id="login-box">
+        <h2>Giriş Yap</h2>
+        <form id="login-form">
+          <label for="login-email">E-posta</label>
+          <input
+            type="email"
+            id="login-email"
+            name="email"
+            placeholder="E-posta"
+            required
+          />
+          <label for="login-password">Şifre</label>
+          <input
+            type="password"
+            id="login-password"
+            name="password"
+            placeholder="Şifre"
+            required
+          />
+          <button type="submit">Giriş Yap</button>
+        </form>
+        <p id="login-message"></p>
+        <p class="switch-link" id="to-register">
+          Hesabınız yok mu? Kayıt Olun.
+        </p>
+      </div>
+    </div>
+
+    <div class="exciting-words">
+      "Aşk, macera, korku ve polisiye... Her anı heyecan dolu bir hikaye seni
+      bekliyor!"
+    </div>
+
+    <script>
+      function switchForm(toShow, toHide) {
+        document.getElementById(toShow).classList.add("active");
+        document.getElementById(toHide).classList.remove("active");
+      }
+
+      document.getElementById("to-login").addEventListener("click", () => {
+        switchForm("login-box", "register-box");
+      });
+
+      document.getElementById("to-register").addEventListener("click", () => {
+        switchForm("register-box", "login-box");
+      });
+
+      async function postData(url, data) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+          return { success: response.ok, result };
+        } catch (error) {
+          return { success: false, result: { message: error.message } };
+        }
+      }
+
+      document
+        .getElementById("registration-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          const response = await postData("http://localhost:3000/register", {
+            username,
+            email,
+            password,
+          });
+
+          const message = document.getElementById("register-message");
+          if (response.success) {
+            message.textContent = "Kayıt başarılı! Giriş yapabilirsiniz.";
+            message.style.color = "green";
+          } else {
+            message.textContent = response.result.message || "Kayıt başarısız!";
+            message.style.color = "red";
+          }
+        });
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("login-email").value;
+          const password = document.getElementById("login-password").value;
+
+          const response = await postData("http://localhost:3000/login", {
+            email,
+            password,
+          });
+
+          const message = document.getElementById("login-message");
+          if (response.success) {
+            message.textContent = "Giriş başarılı! Yönlendiriliyorsunuz...";
+            message.style.color = "green";
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 2000);
+          } else {
+            message.textContent = response.result.message || "Giriş başarısız!";
+            message.style.color = "red";
+          }
+        });
+    </script>
+  </body>
+</html>

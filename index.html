@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Stories</title>
+    <link rel="icon" href="/favicon-32x32.png" type="image/x-icon" />
+
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      /* Metin stili */
+      .line {
+        font-size: 3rem;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      /* Yazma ve silme animasyonu */
+      .typing {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 4px solid yellow; /* Sarı çubuk */
+        animation: blink-caret 0.5s step-end infinite;
+      }
+
+      @keyframes blink-caret {
+        50% {
+          border-color: transparent;
+        }
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      header {
+        width: 100%;
+        padding: 10px 20px;
+        background-color: #1a1a1a;
+        position: fixed;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #ff8c42;
+      }
+
+      .site-title {
+        color: #fff;
+        font-size: 1.5em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 20px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        transition: color 0.3s;
+      }
+
+      nav ul li a:hover {
+        color: #f0a500;
+      }
+
+      main {
+        text-align: center;
+        margin-top: 100px; /* Offset for fixed header */
+      }
+
+      .center-text h1 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        color: #f0a500; /* Yellow color */
+      }
+
+      .center-text p {
+        font-size: 1.2em;
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 0 auto 20px auto;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #f0a500;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      a.btn {
+        text-decoration: none;
+      }
+
+      .btn:hover {
+        background-color: #d18c00;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">StoryWorld</div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="signup.html">Hikayeler</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="center-text">
+        <div class="line">INTERAKTİF</div>
+        <div class="line"><span class="typing" id="typing"></span></div>
+        <div class="line">HİKAYELERİ</div>
+
+        <p>
+          Kendi seçimlerini yaparak hikayeyi dilediğin gibi yönlendir ve baş
+          kahraman sen ol!
+        </p>
+        <div class="buttons">
+          <a href="login.html" class="btn">Giriş Yap</a>
+          <a href="signup.html" class="btn">Kayıt Ol</a>
+        </div>
+      </div>
+    </main>
+    <script>
+      const texts = ["AŞK", "MACERA", "KORKU", "POLİSİYE"];
+      let textIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      const typingSpeed = 100; // Harf yazma hızı
+      const deletingSpeed = 70; // Harf silme hızı
+      const pauseTime = 1000; // Tam metni bekletme süresi
+      const typingElement = document.getElementById("typing");
+
+      function type() {
+        const currentText = texts[textIndex];
+        if (isDeleting) {
+          charIndex--; // Harf siliniyor
+        } else {
+          charIndex++; // Harf yazılıyor
+        }
+
+        typingElement.textContent = currentText.slice(0, charIndex);
+
+        if (!isDeleting && charIndex === currentText.length) {
+          // Yazma tamamlandı, dur ve silmeye başla
+          isDeleting = true;
+          setTimeout(type, pauseTime);
+        } else if (isDeleting && charIndex === 0) {
+          // Silme tamamlandı, sıradaki metne geç
+          isDeleting = false;
+          textIndex = (textIndex + 1) % texts.length;
+          setTimeout(type, typingSpeed);
+        } else {
+          // Harf yazma veya silme devam ediyor
+          const delay = isDeleting ? deletingSpeed : typingSpeed;
+          setTimeout(type, delay);
+        }
+      }
+
+      // Yazma animasyonunu başlat
+      type();
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("Interactive Stories: Ready to start your adventure!");
+        // Add interactive features here if needed.
+      });
+    </script>
+  </body>
+</html>

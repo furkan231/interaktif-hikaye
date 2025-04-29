@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Stories</title>
+    <link rel="icon" href="/favicon-32x32.png" type="image/x-icon" />
+    <style>
+      /* Genel Stil Ayarları */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #000;
+      }
+
+      .logo {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #ff8c42;
+      }
+      .nav {
+        display: flex; /* Menü öğelerini yan yana hizalar */
+        align-items: center;
+        margin-left: auto;
+      }
+
+      .nav a {
+        color: white;
+        margin: 0 15px;
+        text-decoration: none;
+        font-size: 16px;
+        position: relative;
+      }
+
+      .nav a:hover {
+        background-color: #555;
+        padding: 5px 10px;
+        border-radius: 4px;
+      }
+
+      /* Kategoriler dropdown menüsü */
+      .categories {
+        position: relative;
+      }
+
+      .category-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%; /* Düğmenin hemen altında görünmesini sağlar */
+        left: 0;
+
+        min-width: 160px;
+        z-index: 1;
+        background-color: transparent;
+      }
+
+      /* Menü öğeleri */
+      .category-dropdown a {
+        color: white;
+        padding: 10px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .category-dropdown a:hover {
+        background-color: yellow; /* Sarı renk */
+        color: black; /* Yazı rengi siyah */
+      }
+
+      /* Kategoriler üzerine gelindiğinde dropdown menüyü göster */
+      .categories:hover .category-dropdown {
+        display: block;
+      }
+
+      .search-bar {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-bar input {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        outline: none;
+      }
+
+      main {
+        padding: 20px;
+      }
+
+      .intro {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 1.2em;
+      }
+
+      .stories {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .story-card {
+        position: relative;
+        background-color: #282846;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s;
+      }
+
+      .story-card:hover {
+        transform: scale(1.05);
+      }
+
+      .story-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .story-card .details {
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      .story-card .details .title {
+        margin: 0;
+      }
+
+      .story-card .details .author {
+        font-size: 0.8em;
+        color: #ccc;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #000;
+      }
+
+      /* Modal Stilleri */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 200; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+      }
+
+      .modal-content {
+        background-color: #1c1c2e;
+        margin: 5% auto; /* 5% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%; /* Could be more or less, depending on screen size */
+        max-width: 800px;
+        border-radius: 10px;
+        color: #fff;
+        position: relative;
+      }
+      #modalSceneImage {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        margin: 20px 0;
+        border-radius: 8px;
+        display: none; /* Başlangıçta gizli */
+      }
+
+      .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #fff;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .modal-title {
+        font-size: 2em;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .modal-author {
+        font-size: 1em;
+        color: #ccc;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .modal-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        white-space: pre-wrap; /* Satır sonlarını korumak için */
+        text-align: center;
+      }
+
+      /* Seçimler için Konteyner */
+      .choices {
+        margin-top: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      /* Seçim Butonları */
+      .choice-button {
+        flex: 1 1 45%; /* İki seçim yan yana gelecek şekilde genişlik */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #ff8c42;
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        padding: 0; /* İçeriği sıfırladık */
+        transition: background-color 0.3s, transform 0.2s;
+        max-width: 300px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative; /* Overlay için gerekli */
+        overflow: hidden; /* Resmin taşmasını önler */
+      }
+
+      .choice-button:hover {
+        background-color: #ffa567;
+        transform: translateY(-5px);
+      }
+
+      /* Seçim Resmi */
+      .choice-image {
+        width: 100%;
+        height: 200px; /* İsteğe bağlı: Resim yüksekliğini ayarlayın */
+        object-fit: cover; /* Resmin kapsayıcıya sığmasını sağlar */
+      }
+
+      /* Seçim Metni ve Overlay */
+      .choice-overlay {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(
+          0,
+          0,
+          0,
+          0.6
+        ); /* Metni okunabilir kılmak için yarı saydam arka plan */
+        color: #fff;
+        padding: 10px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+
+      .choice-text {
+        font-size: 1.1em;
+        font-weight: bold;
+      }
+
+      /* Responsive Tasarım */
+      @media (max-width: 600px) {
+        .choice-button {
+          flex: 1 1 100%; /* Mobilde seçimler tam genişlikte */
+        }
+
+        .choice-image {
+          height: 150px;
+        }
+
+        .modal-text {
+          font-size: 1em;
+          margin-bottom: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">StoryWorld</div>
+      <nav class="nav">
+        <a href="dashboard.html">İnteraktif Hikayeler</a>
+        <div class="categories">
+          <a href="#" id="categories">Kategoriler</a>
+          <div class="category-dropdown">
+            <a href="#">Aşk</a>
+            <a href="#">Macera</a>
+            <a href="#">Polisiye</a>
+            <a href="#">Korku</a>
+            <a href="#">Çocuk</a>
+          </div>
+        </div>
+        <a href="index.html" id="logout">Çıkış</a>
+      </nav>
+      <div class="search-bar">
+        <input type="text" placeholder="Hikaye ara..." />
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        Hayal gücünün sınırlarını zorlayan hikayeler burada!
+      </section>
+
+      <section id="stories" class="stories">
+        <!-- Hikayeler dinamik olarak buraya eklenecek -->
+      </section>
+    </main>
+
+    <footer>&copy; 2024 StoryWorld - Tüm hakları saklıdır.</footer>
+
+    <!-- Modal -->
+    <div id="storyModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="modal-title" id="modalTitle">Hikaye Başlığı</h2>
+        <p class="modal-author" id="modalAuthor">Yazar: Yazar Adı</p>
+        <p class="modal-text" id="modalText">Sahne metni...</p>
+        <!-- EKLENDİ: Sahne Resmi -->
+        <img id="modalSceneImage" src="" alt="Scene Image" />
+        <div class="choices" id="choicesContainer">
+          <!-- Seçenekler dinamik olarak buraya eklenecek -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Modal Yönetimi
+      const modal = document.getElementById("storyModal");
+      const closeModal = document.getElementsByClassName("close")[0];
+      const modalTitle = document.getElementById("modalTitle");
+      const modalAuthor = document.getElementById("modalAuthor");
+      const modalText = document.getElementById("modalText");
+      const choicesContainer = document.getElementById("choicesContainer");
+      const modalSceneImage = document.getElementById("modalSceneImage"); // EKLENDİ
+
+      // Modal'ı kapatma
+      closeModal.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      // Modal dışında tıklandığında kapatma
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      // Hikayeleri sunucudan çekme ve sayfada görüntüleme
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchStories();
+      });
+
+      async function fetchStories() {
+        try {
+          console.log("Hikayeler çekilmeye çalışılıyor...");
+          const response = await fetch("http://localhost:3000/api/stories"); // Backend URL'si
+          console.log("Fetch isteği yapıldı, status:", response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const stories = await response.json();
+          console.log("Hikayeler başarıyla alındı:", stories.length);
+          displayStories(stories);
+        } catch (error) {
+          console.error("Hikayeler alınırken hata:", error);
+          const container = document.getElementById("stories");
+          container.innerHTML = "<p>Hikayeler alınırken bir hata oluştu.</p>";
+        }
+      }
+
+      function displayStories(stories) {
+        const container = document.getElementById("stories");
+        container.innerHTML = ""; // Önceki içerikleri temizle
+
+        if (stories.length === 0) {
+          container.innerHTML = "<p>Hiç hikaye bulunamadı.</p>";
+          return;
+        }
+
+        stories.forEach((story) => {
+          const storyCard = document.createElement("div");
+          storyCard.classList.add("story-card");
+
+          const storyImage = document.createElement("img");
+          // Eğer hikayede resim URL'si varsa kullanın, yoksa placeholder kullanın
+          storyImage.src = story.imageUrl || "https://via.placeholder.com/300";
+          storyImage.alt = `Hikaye Resmi: ${story.title}`;
+
+          const detailsDiv = document.createElement("div");
+          detailsDiv.classList.add("details");
+
+          const titleP = document.createElement("p");
+          titleP.classList.add("title");
+          titleP.textContent = story.title;
+
+          const authorP = document.createElement("p");
+          authorP.classList.add("author");
+          authorP.textContent = `Yazar: ${story.author.username}`;
+
+          detailsDiv.appendChild(titleP);
+          detailsDiv.appendChild(authorP);
+
+          storyCard.appendChild(storyImage);
+          storyCard.appendChild(detailsDiv);
+
+          // Hikaye kartına tıklandığında modal açma ve ilk sahneyi gösterme
+          storyCard.addEventListener("click", () => {
+            openStory(story);
+          });
+
+          container.appendChild(storyCard);
+        });
+      }
+
+      async function openStory(story) {
+        try {
+          modalTitle.textContent = story.title;
+          modalAuthor.textContent = `Yazar: ${story.author.username}`;
+          modalText.textContent = ""; // Önceki sahne metnini temizle
+          choicesContainer.innerHTML = ""; // Önceki seçimleri temizle
+          modalSceneImage.style.display = "none"; // Sahne resmini gizle başlangıçta
+
+          // İlk sahneyi getir
+          const firstSceneId = story.startScene;
+          const scene = await fetchScene(story._id, firstSceneId);
+          displayScene(scene, story._id);
+          modal.style.display = "block";
+        } catch (error) {
+          console.error("Hikaye açılırken hata:", error);
+          alert("Hikaye açılırken bir hata oluştu.");
+        }
+      }
+
+      async function fetchScene(storyId, sceneId) {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/stories/${storyId}/scenes/${sceneId}`
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const scene = await response.json();
+          return scene;
+        } catch (error) {
+          console.error("Sahne çekilirken hata:", error);
+          throw error;
+        }
+      }
+
+      function displayScene(scene, storyId) {
+        // Sahne metnini güncelle
+        modalText.textContent = `Sahne ${scene.sceneId}:\n${scene.text}`;
+
+        // Sahne resmini güncelle EKLENDİ
+        if (scene.imageUrl) {
+          modalSceneImage.src = scene.imageUrl;
+          modalSceneImage.style.display = "block";
+        } else {
+          modalSceneImage.src = "";
+          modalSceneImage.style.display = "none";
+        }
+
+        choicesContainer.innerHTML = ""; // Önceki seçimleri temizle
+
+        if (!scene.choices || scene.choices.length === 0) {
+          // Son sahnelerde resim zaten gösterilmiş olacak
+          const endingMessage = document.createElement("p");
+          endingMessage.textContent = "Hikaye burada sona eriyor.";
+          endingMessage.style.fontSize = "1.2em";
+          endingMessage.style.fontWeight = "bold";
+          endingMessage.style.marginTop = "20px";
+          endingMessage.style.textAlign = "center";
+          choicesContainer.appendChild(endingMessage);
+          return;
+        }
+
+        scene.choices.forEach((choice) => {
+          const button = document.createElement("button");
+          button.classList.add("choice-button");
+
+          // Seçim içeriği
+          const img = document.createElement("img");
+          img.src = choice.imageUrl || "https://via.placeholder.com/150"; // Resim URL'si yoksa placeholder kullan
+          img.alt = `Seçim: ${choice.text}`;
+          img.classList.add("choice-image");
+
+          const overlay = document.createElement("div");
+          overlay.classList.add("choice-overlay");
+
+          const span = document.createElement("span");
+          span.classList.add("choice-text");
+          span.textContent = choice.text;
+
+          overlay.appendChild(span);
+          button.appendChild(img);
+          button.appendChild(overlay);
+
+          button.addEventListener("click", async () => {
+            try {
+              const nextScene = await fetchScene(storyId, choice.nextSceneId);
+              displayScene(nextScene, storyId);
+            } catch (error) {
+              console.error("Sonraki sahne yüklenirken hata:", error);
+              alert("Sonraki sahne yüklenirken bir hata oluştu.");
+            }
+          });
+
+          choicesContainer.appendChild(button);
+        });
+      }
+    </script>
+  </body>
+</html>

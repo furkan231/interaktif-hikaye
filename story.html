@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hikaye Detayı</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+        padding: 20px;
+      }
+      .story-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .story-title {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+      .story-author {
+        font-size: 1em;
+        color: #ccc;
+        margin-bottom: 20px;
+      }
+      .story-text {
+        font-size: 1.2em;
+        line-height: 1.6;
+        white-space: pre-wrap; /* Satır sonlarını korumak için */
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #ff8c42;
+        text-decoration: none;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="story-container">
+      <h1 class="story-title" id="storyTitle">Hikaye Başlığı</h1>
+      <p class="story-author" id="storyAuthor">Yazar: Yazar Adı</p>
+      <div class="story-text" id="storyText">Hikaye metni...</div>
+      <a href="/dashboard" class="back-link">Geri Dön</a>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const storyId = params.get("id");
+
+        if (!storyId) {
+          document.getElementById("storyText").textContent =
+            "Hikaye ID bulunamadı.";
+          return;
+        }
+
+        fetchStory(storyId);
+      });
+
+      async function fetchStory(id) {
+        try {
+          const response = await fetch(`/api/stories/${id}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const story = await response.json();
+          displayStory(story);
+        } catch (error) {
+          console.error("Hikaye alınırken hata:", error);
+          document.getElementById("storyText").textContent =
+            "Hikaye alınırken bir hata oluştu.";
+        }
+      }
+
+      function displayStory(story) {
+        document.getElementById("storyTitle").textContent = story.title;
+        document.getElementById(
+          "storyAuthor"
+        ).textContent = `Yazar: ${story.author.username}`;
+
+        // Hikayenin tüm sahnelerini birleştirerek metin oluşturma
+        let fullText = "";
+        story.scenes.forEach((scene) => {
+          fullText += `Sahne ${scene.sceneId}:\n${scene.text}\n\n`;
+        });
+        document.getElementById("storyText").textContent =
+          fullText || "Hikaye metni bulunamadı.";
+      }
+    </script>
+  </body>
+</html>
